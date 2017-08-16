@@ -8,5 +8,10 @@
         "files": [
             "src/functions.php"
         ]
+    },
+    "extra": {
+        "compilers": [
+            "Pre\\Phpx\\compile"
+        ]
     }
 }
