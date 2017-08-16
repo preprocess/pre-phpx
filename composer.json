@@ -1,0 +1,12 @@
+{
+    "name": "pre/phpx",
+    "type": "pre-compiler",
+    "require": {
+        "pre/plugin": "^0.7.6"
+    },
+    "autoload": {
+        "files": [
+            "src/functions.php"
+        ]
+    }
+}
