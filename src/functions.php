@@ -260,8 +260,8 @@ function parse($nodes) {
 
             $props["children"] = $children;
 
-            if (function_exists("pre_" . $node["name"])) {
-                $code .= "pre_" . $node["name"] . "([" . PHP_EOL;
+            if (function_exists("Pre\\Phpx\\Renderer\\_" . $node["name"])) {
+                $code .= "Pre\\Phpx\\Renderer\\_" . $node["name"] . "([" . PHP_EOL;
             }
 
             else {
@@ -293,4 +293,197 @@ function parse($nodes) {
 
 function compile($code) {
     return parse(nodes(tokens($code)));
+}
+
+namespace Pre\Phpx\Renderer;
+
+use Closure;
+use Pre\Collections\Collection;
+
+function element($name, $props, callable $attrs = null) {
+    $code = "<{$name}";
+
+    $className = $props["className"] ?? null;
+
+    if (is_callable($className)) {
+        $className = $className();
+    }
+
+    if ($className instanceof Collection) {
+        $className = $className->toArray();
+    }
+
+    if (is_array($className)) {
+        $combined = "";
+
+        foreach ($className as $key => $value) {
+            if (is_string($key)) {
+                $combined .= !!$value ? " {$key}" : "";
+            }
+
+            else {
+                $combined .= " {$value}";
+            }
+        }
+
+        $className = trim($combined);
+    }
+
+    if ($className) {
+        $code .= " class='{$className}'";
+    }
+
+    $style = $props["style"] ?? null;
+
+    if (is_callable($style)) {
+        $style = $style();
+    }
+
+    if ($style instanceof Collection) {
+        $style = $style->toArray();
+    }
+
+    if (is_array($style)) {
+        $styles = [];
+
+        foreach ($style as $key => $value) {
+            $styles[] = "{$key}: {$value}";
+        }
+
+        $style = join("; ", $styles);
+    }
+
+    if ($style) {
+        $code .= " style='{$style}'";
+    }
+
+    $code .= ">";
+
+    foreach ($props["children"] as $child) {
+        $code .= $child;
+    }
+
+    $code .= "</{$name}>";
+
+    return $code;
+}
+
+
+define("ELEMENTS", [
+    "a",
+    "abbr",
+    "address",
+    "area",
+    "article",
+    "aside",
+    "audio",
+    "b",
+    "base",
+    "bdi",
+    "bdo",
+    "blockquote",
+    "body",
+    "br",
+    "button",
+    "canvas",
+    "caption",
+    "cite",
+    "code",
+    "col",
+    "colgroup",
+    "data",
+    "datalist",
+    "dd",
+    "del",
+    "details",
+    "dfn",
+    "div",
+    "dl",
+    "dt",
+    "em",
+    "embed",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "head",
+    "header",
+    "hr",
+    "html",
+    "i",
+    "iframe",
+    "img",
+    "input",
+    "ins",
+    "kbd",
+    "label",
+    "legend",
+    "li",
+    "link",
+    "main",
+    "map",
+    "mark",
+    "meta",
+    "meter",
+    "nav",
+    "noframes",
+    "noscript",
+    "object",
+    "ol",
+    "optgroup",
+    "option",
+    "output",
+    "p",
+    "param",
+    "pre",
+    "progress",
+    "q",
+    "rp",
+    "rt",
+    "rtc",
+    "ruby",
+    "s",
+    "samp",
+    "script",
+    "section",
+    "select",
+    "slot",
+    "small",
+    "source",
+    "span",
+    "strong",
+    "style",
+    "sub",
+    "summary",
+    "sup",
+    "table",
+    "tbody",
+    "td",
+    "template",
+    "textarea",
+    "tfoot",
+    "th",
+    "thead",
+    "time",
+    "title",
+    "tr",
+    "track",
+    "u",
+    "ul",
+    "var",
+    "video",
+    "wbr",
+]);
+
+foreach (ELEMENTS as $element) {
+    eval("namespace Pre\Phpx\Renderer { function _{$element}(\$props) {
+        return element('{$element}', \$props);
+    } }");
 }
