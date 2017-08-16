@@ -74,6 +74,7 @@ function tokens($code) {
             $code[$cursor] === ">"
             && !$matchesEqualBefore && !$matchesEqualAfter
             && $attributeLevel < 1
+            && $elementStarted !== null
         ) {
             $elementLevel--;
             $elementEnded = $cursor;
@@ -228,24 +229,25 @@ function parse($nodes) {
                         $attributes["attr_{$key}"] = $value["token"];
                     }
 
-                    if (isset($value["tag"])) {
+                    else if (isset($value["tag"])) {
                         $attributes["attr_{$key}"] = parse([$value]);
+                    }
+
+                    else {
+                        throw new Exception("attribute not token or tag");
                     }
                 }
             }
 
             preg_match_all("#([a-zA-Z]+)={([^}]+)}#", $node["tag"], $dynamic);
-            preg_match_all("#([a-zA-Z]+)=[']([^']+)[']#", $node["tag"], $static);
 
             if (count($dynamic[0])) {
                 foreach($dynamic[1] as $key => $value) {
-                    $props["{$value}"] = $attributes["attr_{$key}"];
-                }
-            }
+                    if (!isset($attributes["attr_{$key}"])) {
+                        throw new Exception("attribute not defined");
+                    }
 
-            if (count($static[1])) {
-                foreach($static[1] as $key => $value) {
-                    $props["{$value}"] = $static[2][$key];
+                    $props["{$value}"] = $attributes["attr_{$key}"];
                 }
             }
 
