@@ -2,6 +2,8 @@
 
 namespace Pre\Phpx;
 
+use Exception;
+
 function tokens($code) {
     $tokens = [];
 
@@ -119,7 +121,7 @@ function tokens($code) {
 
     $tokens[] = trim($code);
 
-    return array_filter($tokens);
+    return $tokens;
 }
 
 function nodes($tokens) {
@@ -132,7 +134,11 @@ function nodes($tokens) {
     while ($cursor < $length) {
         $token =& $tokens[$cursor];
 
-        if (is_array($token) && !empty($token["tag"]) && $token["tag"][1] !== "/") {
+        if (!is_array($token)) {
+            $token = ["text" => $token];
+        }
+
+        if (isset($token["tag"]) && $token["tag"][1] !== "/") {
             preg_match("#^<([a-zA-Z]+)#", $token["tag"], $matches);
 
             if ($current !== null) {
@@ -161,7 +167,7 @@ function nodes($tokens) {
                     }
 
                     foreach ($item as $value) {
-                        if (!empty($value["token"])) {
+                        if (!empty($value["text"])) {
                             return $value;
                         }
                     }
@@ -172,7 +178,7 @@ function nodes($tokens) {
             }
         }
 
-        else if (is_array($token) && !empty($token["tag"]) && $token["tag"][1] === "/") {
+        else if (isset($token["tag"]) && $token["tag"][1] === "/") {
             preg_match("#^</([a-zA-Z]+)#", $token["tag"], $matches);
 
             if ($current === null) {
@@ -189,16 +195,12 @@ function nodes($tokens) {
         }
 
         else if ($current !== null) {
-            array_push($current["children"], [
-                "parent" => &$current,
-                "token" => &$token,
-            ]);
+            $token["parent"] =& $current;
+            $current["children"][] =& $token;
         }
 
         else {
-            array_push($nodes, [
-                "token" => $token,
-            ]);
+            $nodes[] =& $token;
         }
 
         $cursor++;
@@ -211,12 +213,8 @@ function parse($nodes) {
     $code = "";
 
     foreach ($nodes as $node) {
-        if (isset($node["token"])) {
-            if (is_array($node["token"])) {
-                continue;
-            }
-
-            $code .= $node["token"] . PHP_EOL;
+        if (isset($node["text"])) {
+            $code .= $node["text"] . PHP_EOL;
         }
 
         if (isset($node["tag"])) {
@@ -224,17 +222,14 @@ function parse($nodes) {
             $attributes = [];
 
             if (isset($node["attributes"])) {
-                foreach ($node["attributes"] as $key => $value) {
-                    if (isset($value["token"])) {
-                        $attributes["attr_{$key}"] = $value["token"];
-                    }
+                $node["attributes"] = array_filter($node["attributes"]);
 
-                    else if (isset($value["tag"])) {
+                foreach ($node["attributes"] as $key => $value) {
+                    if (isset($value["tag"])) {
                         $attributes["attr_{$key}"] = parse([$value]);
                     }
-
                     else {
-                        throw new Exception("attribute not token or tag");
+                        $attributes["attr_{$key}"] = $value["text"];
                     }
                 }
             }
@@ -259,7 +254,7 @@ function parse($nodes) {
                 }
 
                 else {
-                    $children[] = "\"" . addslashes($child["token"]) . "\"";
+                    $children[] = "\"" . addslashes($child["text"]) . "\"";
                 }
             }
 
@@ -289,7 +284,7 @@ function parse($nodes) {
                 }
             }
 
-            $code .= "])" . PHP_EOL;
+            $code .= "])";
         }
     }
 
