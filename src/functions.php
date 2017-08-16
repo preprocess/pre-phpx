@@ -131,7 +131,7 @@ function nodes($tokens) {
     while ($cursor < $length) {
         $token =& $tokens[$cursor];
 
-        if (is_array($token) && $token["tag"][1] !== "/") {
+        if (is_array($token) && !empty($token["tag"]) && $token["tag"][1] !== "/") {
             preg_match("#^<([a-zA-Z]+)#", $token["tag"], $matches);
 
             if ($current !== null) {
@@ -171,7 +171,7 @@ function nodes($tokens) {
             }
         }
 
-        else if (is_array($token) && $token["tag"][1] === "/") {
+        else if (is_array($token) && !empty($token["tag"]) && $token["tag"][1] === "/") {
             preg_match("#^</([a-zA-Z]+)#", $token["tag"], $matches);
 
             if ($current === null) {
@@ -211,6 +211,10 @@ function parse($nodes) {
 
     foreach ($nodes as $node) {
         if (isset($node["token"])) {
+            if (is_array($node["token"])) {
+                continue;
+            }
+
             $code .= $node["token"] . PHP_EOL;
         }
 
