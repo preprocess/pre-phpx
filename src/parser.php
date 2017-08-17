@@ -19,9 +19,20 @@ function tokens($code) {
     $attributeStarted = null;
     $attributeEnded = null;
 
+    $expressionLevel = 0;
+    $expressionStarted = null;
+    $expressionEnded = null;
+
+    $nestedLevel = 0;
+    $inQuote = false;
+
     $carry = 0;
 
     while ($cursor < $length) {
+        if ($code[$cursor] === '"' || $code[$cursor] === "'" && $code[$cursor - 1] !== "\\") {
+            $inQuote = !$inQuote;
+        }
+
         if ($code[$cursor] === "{" && $elementStarted !== null) {
             if ($attributeLevel === 0) {
                 $attributeStarted = $cursor;
@@ -38,7 +49,7 @@ function tokens($code) {
             }
         }
 
-        if ($attributeStarted && $attributeEnded) {
+        if ($attributeStarted !== null && $attributeEnded !== null) {
             $position = (string) count($attributes);
             $positionLength = strlen($position);
 
@@ -62,10 +73,60 @@ function tokens($code) {
             continue;
         }
 
+        if ($code[$cursor] === "{" && $elementStarted === null && $nestedLevel > 0) {
+            if ($expressionLevel === 0) {
+                $expressionStarted = $cursor;
+            }
+
+            $expressionLevel++;
+        }
+
+        if ($code[$cursor] === "}" && $elementStarted === null && $nestedLevel > 0) {
+            $expressionLevel--;
+
+            if ($expressionLevel === 0) {
+                $expressionEnded = $cursor;
+            }
+        }
+
+        if ($expressionStarted !== null && $expressionEnded !== null) {
+            $distance = $expressionEnded - $expressionStarted;
+
+            $carry += $cursor;
+
+            $before = trim(substr($code, 0, $expressionStarted));
+            $expression = trim(substr($code, $expressionStarted + 1, $distance - 1));
+            $after = trim(substr($code, $expressionEnded + 1));
+
+            $tokens[] = $before;
+            $tokens[] = ["expression" => compile($expression), "started" => $carry];
+
+            $code = $after;
+            $length = strlen($code);
+            $cursor = 0;
+
+            $expressionStarted = null;
+            $expressionEnded = null;
+
+            continue;
+        }
+
         preg_match("#^</?[a-zA-Z]#", substr($code, $cursor, 3), $matchesStart);
 
-        if (count($matchesStart) && $attributeLevel < 1) {
+        if (
+            count($matchesStart)
+            && $attributeLevel < 1
+            && $expressionLevel < 1
+            && !$inQuote
+        ) {
             $elementLevel++;
+
+            if ($matchesStart[0][1] !== "/") {
+                $nestedLevel++;
+            } else {
+                $nestedLevel--;
+            }
+
             $elementStarted = $cursor;
         }
 
@@ -77,6 +138,7 @@ function tokens($code) {
             && !$matchesEqualBefore && !$matchesEqualAfter
             && $attributeLevel < 1
             && $elementStarted !== null
+            && $expressionStarted === null
         ) {
             $elementLevel--;
             $elementEnded = $cursor;
@@ -101,8 +163,20 @@ function tokens($code) {
                 $token["attributes"] = $attributes;
             }
 
-            $tokens[] = $before;
+            if ($expressionStarted !== null) {
+                $tokens[] = ["expression" => $before, "started" => $expressionStarted];
+            } else {
+                $tokens[] = $before;
+            }
+
             $tokens[] = $token;
+
+            if (preg_match("#/>$#", $tag)) {
+                preg_match("#<([a-zA-Z]+)#", $tag, $matchesName);
+
+                $name = $matchesName[1];
+                $tokens[] = ["tag" => "</{$name}>"];
+            }
 
             $attributes = [];
 
@@ -234,7 +308,7 @@ function parse($nodes) {
                 }
             }
 
-            preg_match_all("#([a-zA-Z]+)={([^}]+)}#", $node["tag"], $dynamic);
+            preg_match_all("#([a-zA-Z][a-zA-Z-_]+)={([^}]+)}#", $node["tag"], $dynamic);
 
             if (count($dynamic[0])) {
                 foreach($dynamic[1] as $key => $value) {
@@ -253,6 +327,10 @@ function parse($nodes) {
                     $children[] = parse([$child]);
                 }
 
+                else if (isset($child["expression"])) {
+                    $children[] = $child["expression"];
+                }
+
                 else {
                     $children[] = "\"" . addslashes($child["text"]) . "\"";
                 }
@@ -260,23 +338,39 @@ function parse($nodes) {
 
             $props["children"] = $children;
 
-            if (function_exists("Pre\\Phpx\\Renderer\\_" . $node["name"])) {
-                $code .= "Pre\\Phpx\\Renderer\\_" . $node["name"] . "([" . PHP_EOL;
+            if (function_exists("\\Pre\\Phpx\\Renderer\\__" . $node["name"])) {
+                $code .= "\\Pre\\Phpx\\Renderer\\__" . $node["name"] . "([" . PHP_EOL;
             }
 
             else {
-                $code .= $node["name"] . "([" . PHP_EOL;
+                $name = $node["name"];
+                $code .= "(new {$name})->render([" . PHP_EOL;
             }
 
             foreach ($props as $key => $value) {
                 if ($key === "children") {
-                    $code .= "\"children\" => [" . PHP_EOL;
+                    $children = array_filter($children, function($child) {
+                        return trim($child, "\"'");
+                    });
 
-                    foreach ($children as $child) {
-                        $code .= "{$child}," . PHP_EOL;
+                    $children = array_map("trim", $children);
+
+                    $children = array_values($children);
+
+                    if (count($children) === 1) {
+                        $code .= "\"children\" => " . $children[0] . "," . PHP_EOL;
                     }
 
-                    $code .= "]," . PHP_EOL;
+                    else {
+                        $code .= "\"children\" => [" . PHP_EOL;
+
+                        foreach ($children as $child) {
+                            $code .= "{$child}," . PHP_EOL;
+                        }
+
+                        $code .= "]," . PHP_EOL;
+                    }
+
                 }
 
                 else {
@@ -293,197 +387,4 @@ function parse($nodes) {
 
 function compile($code) {
     return parse(nodes(tokens($code)));
-}
-
-namespace Pre\Phpx\Renderer;
-
-use Closure;
-use Pre\Collections\Collection;
-
-function element($name, $props, callable $attrs = null) {
-    $code = "<{$name}";
-
-    $className = $props["className"] ?? null;
-
-    if (is_callable($className)) {
-        $className = $className();
-    }
-
-    if ($className instanceof Collection) {
-        $className = $className->toArray();
-    }
-
-    if (is_array($className)) {
-        $combined = "";
-
-        foreach ($className as $key => $value) {
-            if (is_string($key)) {
-                $combined .= !!$value ? " {$key}" : "";
-            }
-
-            else {
-                $combined .= " {$value}";
-            }
-        }
-
-        $className = trim($combined);
-    }
-
-    if ($className) {
-        $code .= " class='{$className}'";
-    }
-
-    $style = $props["style"] ?? null;
-
-    if (is_callable($style)) {
-        $style = $style();
-    }
-
-    if ($style instanceof Collection) {
-        $style = $style->toArray();
-    }
-
-    if (is_array($style)) {
-        $styles = [];
-
-        foreach ($style as $key => $value) {
-            $styles[] = "{$key}: {$value}";
-        }
-
-        $style = join("; ", $styles);
-    }
-
-    if ($style) {
-        $code .= " style='{$style}'";
-    }
-
-    $code .= ">";
-
-    foreach ($props["children"] as $child) {
-        $code .= $child;
-    }
-
-    $code .= "</{$name}>";
-
-    return $code;
-}
-
-
-define("ELEMENTS", [
-    "a",
-    "abbr",
-    "address",
-    "area",
-    "article",
-    "aside",
-    "audio",
-    "b",
-    "base",
-    "bdi",
-    "bdo",
-    "blockquote",
-    "body",
-    "br",
-    "button",
-    "canvas",
-    "caption",
-    "cite",
-    "code",
-    "col",
-    "colgroup",
-    "data",
-    "datalist",
-    "dd",
-    "del",
-    "details",
-    "dfn",
-    "div",
-    "dl",
-    "dt",
-    "em",
-    "embed",
-    "fieldset",
-    "figcaption",
-    "figure",
-    "footer",
-    "form",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "head",
-    "header",
-    "hr",
-    "html",
-    "i",
-    "iframe",
-    "img",
-    "input",
-    "ins",
-    "kbd",
-    "label",
-    "legend",
-    "li",
-    "link",
-    "main",
-    "map",
-    "mark",
-    "meta",
-    "meter",
-    "nav",
-    "noframes",
-    "noscript",
-    "object",
-    "ol",
-    "optgroup",
-    "option",
-    "output",
-    "p",
-    "param",
-    "pre",
-    "progress",
-    "q",
-    "rp",
-    "rt",
-    "rtc",
-    "ruby",
-    "s",
-    "samp",
-    "script",
-    "section",
-    "select",
-    "slot",
-    "small",
-    "source",
-    "span",
-    "strong",
-    "style",
-    "sub",
-    "summary",
-    "sup",
-    "table",
-    "tbody",
-    "td",
-    "template",
-    "textarea",
-    "tfoot",
-    "th",
-    "thead",
-    "time",
-    "title",
-    "tr",
-    "track",
-    "u",
-    "ul",
-    "var",
-    "video",
-    "wbr",
-]);
-
-foreach (ELEMENTS as $element) {
-    eval("namespace Pre\Phpx\Renderer { function _{$element}(\$props) {
-        return element('{$element}', \$props);
-    } }");
 }

@@ -6,7 +6,8 @@
     },
     "autoload": {
         "files": [
-            "src/functions.php"
+            "src/parser.php",
+            "src/renderers.php"
         ]
     },
     "extra": {
