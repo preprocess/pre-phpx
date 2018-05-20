@@ -14,28 +14,36 @@ function Error(\$props) {
         "started" => 61,
         "attributes" => [
             [
-                "type" => "tag",
-                "value" => "<span className={0}>",
-                "attributes" => [
-                    [
-                        "type" => "literal",
-                        "value" => "\"error\"",
-                    ],
+                [
+                    "type" => "literal",
+                    "value" => "\$error ⇒",
                 ],
-                "children" => [
-                    [
-                        "type" => "expression",
-                        "value" => [
+                [
+                    "type" => "tag",
+                    "value" => "<span className={0}>",
+                    "attributes" => [
+                        [
                             [
                                 "type" => "literal",
-                                "value" => "\$error",
+                                "value" => "\"error\"",
                             ],
                         ],
-                        "started" => 37,
                     ],
+                    "children" => [
+                        [
+                            "type" => "expression",
+                            "value" => [
+                                [
+                                    "type" => "literal",
+                                    "value" => "\$error",
+                                ],
+                            ],
+                            "started" => 37,
+                        ],
+                    ],
+                    "name" => "span",
+                    "started" => 30,
                 ],
-                "name" => "span",
-                "started" => 30,
             ],
         ],
         "name" => "div",

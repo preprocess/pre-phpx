@@ -1,0 +1,24 @@
+<?php
+
+function Error($props) {
+    return (
+        <div className={"outer" . cls("special")} render={$error ⇒ <span className={"error"}>{$error}</span>}>
+            <span className={"icon"}></span>
+            You forgot the {$props->name} field
+        </div>
+    );
+}
+
+function ErrorRenderer($props) {
+    return (
+        <Error>
+            {function($error) => {
+                return <span>{$error}</span>;
+            }}
+        </Error>
+    );
+}
+
+function InputRenderer($props) {
+    return <input type={$props->type} />;
+}

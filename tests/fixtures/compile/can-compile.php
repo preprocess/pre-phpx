@@ -1,71 +1,30 @@
 <?php
 
-return [
-    [
-        "type" => "literal",
-        "value" => trim("
-function Error(\$props) {
-    return (
-        "),
-    ],
-    [
-        "type" => "tag",
-        "value" => "<div render={0}>",
-        "started" => 61,
-        "attributes" => [
-            [
-                "type" => "tag",
-                "value" => "<span className={0}>",
-                "attributes" => [
-                    [
-                        "type" => "literal",
-                        "value" => "\"error\"",
-                    ],
-                ],
-                "children" => [
-                    [
-                        "type" => "expression",
-                        "value" => [
-                            [
-                                "type" => "literal",
-                                "value" => "\$error",
-                            ],
-                        ],
-                        "started" => 37,
-                    ],
-                ],
-                "name" => "span",
-                "started" => 30,
-            ],
-        ],
-        "name" => "div",
-        "children" => [
-            [
-                "type" => "literal",
-                "value" => "You forgot the",
-                "started" => 15,
-            ],
-            [
-                "type" => "expression",
-                "value" => [
-                    [
-                        "type" => "literal",
-                        "value" => "\$props->name",
-                    ],
-                ],
-                "started" => 89,
-            ],
-            [
-                "type" => "literal",
-                "value" => "field",
-            ],
-        ],
-    ],
-    [
-        "type" => "literal",
-        "value" => trim("
-    );
+function Error($props) {
+    return ( render("div", [
+"className" => "outer" . cls("special"),
+"render" => $error ⇒ render("span", [
+"className" => "error",
+"children" => $error,
+]),
+"children" => [render("span", [
+"className" => "icon",
+]) , "You forgot the", $props->name, "field"],
+]) );
 }
-        "),
-    ],
-];
+
+function ErrorRenderer($props) {
+    return ( render("Error", [
+"children" => function($error) => {
+                return render("span", [
+"children" => $error,
+]) ;
+            },
+]) );
+}
+
+function InputRenderer($props) {
+    return render("input", [
+"type" => $props->type,
+]) ;
+}

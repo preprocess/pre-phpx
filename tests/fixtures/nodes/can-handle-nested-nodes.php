@@ -14,8 +14,10 @@ function Label(\$props) {
         "started" => 64,
         "attributes" => [
             [
-                "type" => "literal",
-                "value" => "\"outer\"",
+                [
+                    "type" => "literal",
+                    "value" => "\"outer\"",
+                ],
             ],
         ],
         "name" => "div",
@@ -36,9 +38,11 @@ function Label(\$props) {
                 "started" => 97,
                 "attributes" => [
                     [
-                        "type" => "literal",
-                        "value" => "\"inner\"",
-                    ],
+                        [
+                            "type" => "literal",
+                            "value" => "\"inner\"",
+                        ],
+                    ]
                 ],
                 "name" => "div",
                 "children" => [

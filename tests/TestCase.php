@@ -8,13 +8,13 @@ abstract class TestCase extends BaseTestCase
         return new Pre\Phpx\Parser();
     }
 
-    protected function fixtureCode($path)
+    protected function fixtureCode($path, $extension = "txt")
     {
-        return trim(file_get_contents(__DIR__ . "/fixtures/{$path}.txt"));
+        return trim(file_get_contents(__DIR__ . "/fixtures/{$path}.{$extension}"));
     }
 
-    protected function fixtureData($path)
+    protected function fixtureData($path, $extension = "php")
     {
-        return require __DIR__ . "/fixtures/{$path}.php";
+        return require __DIR__ . "/fixtures/{$path}.{$extension}";
     }
 }

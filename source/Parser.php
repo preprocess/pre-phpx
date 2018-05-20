@@ -248,24 +248,6 @@ class Parser
                     foreach ($current["attributes"] as $key => $value) {
                         $current["attributes"][$key] = $this->nodes($value);
                     }
-
-                    $current["attributes"] = array_map(function($item) {
-                        foreach ($item as $value) {
-                            if ($value["type"] === "tag") {
-                                return $value;
-                            }
-                        }
-
-                        foreach ($item as $value) {
-                            if ($value["type"] === "literal") {
-                                return $value;
-                            }
-                        }
-
-                        // TODO
-                        // assumption: attributes can only be literals or tags
-                        // figure out if this is true
-                    }, $current["attributes"]);
                 }
             }
 
@@ -313,6 +295,65 @@ class Parser
         return $nodes;
     }
 
+    public function translate($nodes, $quoteLiterals = false, $combineChildren = false) {
+        $code = "";
+
+        foreach ($nodes as $node) {
+            if ($node["type"] === "literal") {
+                if ($quoteLiterals) {
+                    $code .= "\"" . addSlashes($node["value"]) . "\"";
+                } else {
+                    $code .= $node["value"];
+                }
+
+                if ($combineChildren) {
+                    $code .= ", ";
+                }
+
+                continue;
+            }
+            if ($node["type"] === "expression") {
+                $code .= $this->translate($node["value"]);
+
+                if ($combineChildren) {
+                    $code .= ", ";
+                }
+                
+                continue;
+            }
+
+            $code .= " render(\"{$node["name"]}\", [" . PHP_EOL;
+            
+
+            if (isset($node["attributes"])) {
+                preg_match_all("#(\S+)={[^}]+?}#", $node["value"], $matches);
+
+                foreach ($matches[1] as $i => $name) {
+                    $code .= "\"{$name}\" => " . $this->translate($node["attributes"][$i], false, false) . "," . PHP_EOL;
+                }
+            }
+
+            if (isset($node["children"]) && count($node["children"]) > 0) {
+                $translated = $this->translate($node["children"], true, true);
+
+                if (count($node["children"]) > 1) {
+                    $code .= "\"children\" => [{$translated}]," . PHP_EOL;
+                } else {
+                    $code .= "\"children\" => {$translated}," . PHP_EOL;
+                }
+                
+            }
+
+            $code .= "]) ";
+
+            if ($combineChildren) {
+                $code .= ", ";
+            }
+        }
+
+        return trim($code, " .,");
+    }
+
     public static function compile($code)
     {
         static $parser;
@@ -321,6 +362,6 @@ class Parser
             $parser = new static();
         }
 
-        return $parser->nodes($parser->tokens($code));
+        return $parser->translate($parser->nodes($parser->tokens($code)));
     }
 }
