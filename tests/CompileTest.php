@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @covers Pre\Phpx\Parser::__construct
  * @covers Pre\Phpx\Parser::compile
  * @covers Pre\Phpx\Parser::translate
  * @covers Pre\Phpx\Parser::format
