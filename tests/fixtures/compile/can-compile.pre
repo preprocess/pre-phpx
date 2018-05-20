@@ -2,7 +2,12 @@
 
 function Error($props) {
     return (
-        <div className={"outer" . cls("special")} render={function($error) { return <span className={"error"}>{$error}</span>; }}>
+        <div
+            className={"outer" . cls("special")}
+            render={function($error) {
+                return <span className={"error"}>{$error}</span>;
+            }}
+        >
             <span className={"icon"}></span>
             You forgot the {$props->name} field
         </div>
