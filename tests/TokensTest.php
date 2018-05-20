@@ -5,40 +5,40 @@
  */
 class TokensTest extends TestCase
 {
-    public function test_can_tokenise()
+    public function test_can_handle_expressions()
     {
         $this->assertEquals(
-            $this->fixtureData("can-tokenise"),
-            $this->parser()->tokens($this->fixtureCode("can-tokenise"))
+            $this->fixtureData("tokens/can-handle-expressions"),
+            $this->parser()->tokens($this->fixtureCode("tokens/can-handle-expressions"))
         );
     }
 
     public function test_can_ignore_markup_in_string() {
         $this->assertEquals(
-            $this->fixtureData("can-ignore-markup-in-string"),
-            $this->parser()->tokens($this->fixtureCode("can-ignore-markup-in-string"))
+            $this->fixtureData("tokens/can-ignore-markup-in-string"),
+            $this->parser()->tokens($this->fixtureCode("tokens/can-ignore-markup-in-string"))
         );
     }
 
     public function test_can_handle_simple_props() {
         $this->assertEquals(
-            $this->fixtureData("can-handle-simple-props"),
-            $this->parser()->tokens($this->fixtureCode("can-handle-simple-props"))
+            $this->fixtureData("tokens/can-handle-simple-props"),
+            $this->parser()->tokens($this->fixtureCode("tokens/can-handle-simple-props"))
         );
     }
 
     public function test_can_handle_complex_props() {
         $this->assertEquals(
-            $this->fixtureData("can-handle-complex-props"),
-            $this->parser()->tokens($this->fixtureCode("can-handle-complex-props"))
+            $this->fixtureData("tokens/can-handle-complex-props"),
+            $this->parser()->tokens($this->fixtureCode("tokens/can-handle-complex-props"))
         );
     }
 
     public function test_can_handle_self_closing_tags()
     {
         $this->assertEquals(
-            $this->fixtureData("can-handle-self-closing-tags"),
-            $this->parser()->tokens($this->fixtureCode("can-handle-self-closing-tags"))
+            $this->fixtureData("tokens/can-handle-self-closing-tags"),
+            $this->parser()->tokens($this->fixtureCode("tokens/can-handle-self-closing-tags"))
         );
     }
 }
