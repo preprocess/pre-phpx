@@ -9,7 +9,12 @@
         "phpunit/phpunit": "^5.0|^6.0"
     },
     "autoload": {
-        "files": ["src/parser.php", "src/renderers.php"]
+        "psr-4": {
+            "Pre\\Phpx\\": "source"
+        }
+    },
+    "autoload-dev": {
+        "files": ["tests/TestCase.php"]
     },
     "extra": {
         "compilers": ["Pre\\Phpx\\compile"]
