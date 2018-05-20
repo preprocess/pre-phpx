@@ -7,26 +7,30 @@ class TokensTest extends TestCase
 {
     public function test_can_tokenise()
     {
-        $code = "
-            function Hello(\$props) {
-                return <div>Hello {\$props->name}</div>;
-            }
-        ";
+        $this->assertEquals(
+            $this->fixtureData("can-tokenise"),
+            $this->parser()->tokens($this->fixtureCode("can-tokenise"))
+        );
+    }
 
-        $expected = [
-            "function Hello(\$props) {
-                return",
-            [ "tag" => "<div>", "started" => 65 ],
-            "Hello",
-            [ "expression" => "\$props->name", "started" => 84 ],
-            "",
-            [ "tag" => "</div>", "started" => 89 ],
-            ";
-            }",
-        ];
+    public function test_can_ignore_markup_in_string() {
+        $this->assertEquals(
+            $this->fixtureData("can-ignore-markup-in-string"),
+            $this->parser()->tokens($this->fixtureCode("can-ignore-markup-in-string"))
+        );
+    }
 
-        $actual = $this->parser()->tokens($code);
+    public function test_can_handle_simple_props() {
+        $this->assertEquals(
+            $this->fixtureData("can-handle-simple-props"),
+            $this->parser()->tokens($this->fixtureCode("can-handle-simple-props"))
+        );
+    }
 
-        $this->assertEquals($expected, $actual);
+    public function test_can_handle_complex_props() {
+        $this->assertEquals(
+            $this->fixtureData("can-handle-complex-props"),
+            $this->parser()->tokens($this->fixtureCode("can-handle-complex-props"))
+        );
     }
 }

@@ -196,7 +196,7 @@ class Parser
 
         $tokens[] = trim($code);
 
-        return $tokens;
+        return array_values(array_filter($tokens));
     }
 
     public function nodes($tokens)
