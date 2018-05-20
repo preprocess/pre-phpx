@@ -1,26 +1,40 @@
 <?php
 
 return [
-    trim("
+    [
+        "type" => "literal",
+        "value" => trim("
 function Hello(\$props) {
     return
-    "),
+        "),
+    ],
     [
-        "tag" => "<div className={0}>",
+        "type" => "tag",
+        "value" => "<div className={0}>",
         "started" => 54,
         "attributes" => [
             [
-                "\"error\""
+                [
+                    "type" => "literal",
+                    "value" => "\"error\"",
+                ],
             ],
         ],
     ],
-    "You forgot a field",
     [
-        "tag" => "</div>",
+        "type" => "literal",
+        "value" => "You forgot a field",
+    ],
+    [
+        "type" => "tag",
+        "value" => "</div>",
         "started" => 77,
     ],
-    trim("
+    [
+        "type" => "literal",
+        "value" => trim("
     ;
 }
-    "),
+        "),
+    ],
 ];

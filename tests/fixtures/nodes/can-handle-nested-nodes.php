@@ -2,49 +2,73 @@
 
 return [
     [
-        "text" => trim("
+        "type" => "literal",
+        "value" => trim("
 function Label(\$props) {
     return (
         "),
     ],
     [
-        "tag" => "<div className={0}>",
+        "type" => "tag",
+        "value" => "<div className={0}>",
         "started" => 64,
         "attributes" => [
             [
-                "text" => "\"outer\"",
+                "type" => "literal",
+                "value" => "\"outer\"",
             ],
         ],
         "name" => "div",
         "children" => [
             [
-                "expression" => "\$props->prefix",
+                "type" => "expression",
+                "value" => [
+                    [
+                        "type" => "literal",
+                        "value" => "\$props->prefix",
+                    ],
+                ],
                 "started" => 79,
             ],
             [
-                "tag" => "<div className={0}>",
+                "type" => "tag",
+                "value" => "<div className={0}>",
                 "started" => 97,
                 "attributes" => [
                     [
-                        "text" => "\"inner\"",
+                        "type" => "literal",
+                        "value" => "\"inner\"",
                     ],
                 ],
                 "name" => "div",
                 "children" => [
                     [
-                        "expression" => "\$props->text",
+                        "type" => "expression",
+                        "value" => [
+                            [
+                                "type" => "literal",
+                                "value" => "\$props->text",
+                            ],
+                        ],
                         "started" => 110,
                     ],
                 ],
             ],
             [
-                "expression" => "\$props->suffix",
+                "type" => "expression",
+                "value" => [
+                    [
+                        "type" => "literal",
+                        "value" => "\$props->suffix",
+                    ],
+                ],
                 "started" => 130,
             ],
         ],
     ],
     [
-        "text" => trim("
+        "type" => "literal",
+        "value" => trim("
     );
 }
         "),

@@ -101,8 +101,8 @@ class Parser
                 $expression = trim(substr($code, $expressionStarted + 1, $distance - 1));
                 $after = trim(substr($code, $expressionEnded + 1));
 
-                $tokens[] = $before;
-                $tokens[] = ["expression" => trim($this->ast($this->nodes($this->tokens($expression)))), "started" => $carry];
+                $tokens[] = ["type" => "literal", "value" => $before, "started" => $expressionStarted];
+                $tokens[] = ["type" => "expression", "value" => $this->nodes($this->tokens($expression)), "started" => $carry];
 
                 $code = $after;
                 $length = strlen($code);
@@ -156,7 +156,7 @@ class Parser
                 $tag = trim(substr($code, $elementStarted, $distance + 1));
                 $after = trim(substr($code, $elementEnded + 1));
 
-                $token = ["tag" => $tag, "started" => $carry];
+                $token = ["type" => "tag", "value" => $tag, "started" => $carry];
 
                 foreach ($attributes as $key => $value) {
                     $attributes[$key] = $this->tokens($value);
@@ -171,9 +171,9 @@ class Parser
                 // leaving it until this refactor is done
                 //
                 // if ($expressionStarted !== null) {
-                //     $tokens[] = ["expression" => $before, "started" => $expressionStarted];
+                //     $tokens[] = ["type" => "expression", "value" => $before, "started" => $expressionStarted];
                 // } else {
-                    $tokens[] = $before;
+                    $tokens[] = ["type" => "literal", "value" => $before];
                 // }
 
                 $tokens[] = $token;
@@ -186,10 +186,10 @@ class Parser
                     // added to make the tokens output cleaner
                     //
                     $previous = $tokens[count($tokens) - 1];
-                    $tokens[count($tokens) - 1]["tag"] = trim(substr($previous["tag"], 0, strlen($previous["tag"]) - 2)) . ">";
+                    $tokens[count($tokens) - 1]["value"] = trim(substr($previous["value"], 0, strlen($previous["value"]) - 2)) . ">";
 
                     $name = $matchesName[1];
-                    $tokens[] = ["tag" => "</{$name}>"];
+                    $tokens[] = ["type" => "tag", "value" => "</{$name}>"];
                 }
 
                 $attributes = [];
@@ -207,9 +207,15 @@ class Parser
             $cursor++;
         }
 
-        $tokens[] = trim($code);
+        $tokens[] = ["type" => "literal", "value" => trim($code)];
 
-        return array_values(array_filter($tokens));
+        return array_values(array_filter($tokens, function($token) {
+            if ($token["type"] === "literal" && !trim($token["value"])) {
+                return false;
+            }
+
+            return true;
+        }));
     }
 
     public function nodes($tokens)
@@ -223,12 +229,8 @@ class Parser
         while ($cursor < $length) {
             $token =& $tokens[$cursor];
 
-            if (!is_array($token)) {
-                $token = ["text" => $token];
-            }
-
-            if (isset($token["tag"]) && $token["tag"][1] !== "/") {
-                preg_match("#^<([a-zA-Z]+)#", $token["tag"], $matches);
+            if ($token["type"] === "tag" && $token["value"][1] !== "/") {
+                preg_match("#^<([a-zA-Z]+)#", $token["value"], $matches);
 
                 if ($current !== null) {
                     $token["parent"] =& $current;
@@ -249,26 +251,26 @@ class Parser
 
                     $current["attributes"] = array_map(function($item) {
                         foreach ($item as $value) {
-                            if (isset($value["tag"])) {
+                            if ($value["type"] === "tag") {
                                 return $value;
                             }
                         }
 
                         foreach ($item as $value) {
-                            if (!empty($value["text"])) {
+                            if ($value["type"] === "literal") {
                                 return $value;
                             }
                         }
 
                         // TODO
-                        // assumption: attributes can only be literal code or nested tags
+                        // assumption: attributes can only be literals or tags
                         // figure out if this is true
                     }, $current["attributes"]);
                 }
             }
 
-            else if (isset($token["tag"]) && $token["tag"][1] === "/") {
-                preg_match("#^</([a-zA-Z]+)#", $token["tag"], $matches);
+            else if ($token["type"] === "tag" && $token["value"][1] === "/") {
+                preg_match("#^</([a-zA-Z]+)#", $token["value"], $matches);
 
                 if ($current === null) {
                     throw new Exception("opening tag not found");
@@ -311,109 +313,6 @@ class Parser
         return $nodes;
     }
 
-    public function ast($nodes)
-    {
-        $code = "";
-
-        foreach ($nodes as $node) {
-            if (isset($node["text"])) {
-                $code .= $node["text"] . PHP_EOL;
-            }
-
-            if (isset($node["tag"])) {
-                $props = [];
-                $attributes = [];
-
-                if (isset($node["attributes"])) {
-                    $node["attributes"] = array_filter($node["attributes"]);
-
-                    foreach ($node["attributes"] as $key => $value) {
-                        if (isset($value["tag"])) {
-                            $attributes["attr_{$key}"] = $this->parse([$value]);
-                        }
-                        else {
-                            $attributes["attr_{$key}"] = $value["text"];
-                        }
-                    }
-                }
-
-                preg_match_all("#([a-zA-Z][a-zA-Z-_]+)={([^}]+)}#", $node["tag"], $dynamic);
-
-                if (count($dynamic[0])) {
-                    foreach($dynamic[1] as $key => $value) {
-                        if (!isset($attributes["attr_{$key}"])) {
-                            throw new Exception("attribute not defined");
-                        }
-
-                        $props["{$value}"] = $attributes["attr_{$key}"];
-                    }
-                }
-
-                $children = [];
-
-                foreach ($node["children"] as $child) {
-                    if (isset($child["tag"])) {
-                        $children[] = $this->parse([$child]);
-                    }
-
-                    else if (isset($child["expression"])) {
-                        $children[] = $child["expression"];
-                    }
-
-                    else {
-                        $children[] = "\"" . addslashes($child["text"]) . "\"";
-                    }
-                }
-
-                $props["children"] = $children;
-
-                if (function_exists("\\Pre\\Phpx\\Renderer\\__" . $node["name"])) {
-                    $code .= "\\Pre\\Phpx\\Renderer\\__" . $node["name"] . "([" . PHP_EOL;
-                }
-
-                else {
-                    $name = $node["name"];
-                    $code .= "(new {$name})->render([" . PHP_EOL;
-                }
-
-                foreach ($props as $key => $value) {
-                    if ($key === "children") {
-                        $children = array_filter($children, function($child) {
-                            return trim($child, "\"'");
-                        });
-
-                        $children = array_map("trim", $children);
-
-                        $children = array_values($children);
-
-                        if (count($children) === 1) {
-                            $code .= "\"children\" => " . $children[0] . "," . PHP_EOL;
-                        }
-
-                        else {
-                            $code .= "\"children\" => [" . PHP_EOL;
-
-                            foreach ($children as $child) {
-                                $code .= "{$child}," . PHP_EOL;
-                            }
-
-                            $code .= "]," . PHP_EOL;
-                        }
-
-                    }
-
-                    else {
-                        $code .= "\"{$key}\" => {$value}," . PHP_EOL;
-                    }
-                }
-
-                $code .= "])";
-            }
-        }
-
-        return $code;
-    }
-
     public static function compile($code)
     {
         static $parser;
@@ -422,6 +321,6 @@ class Parser
             $parser = new static();
         }
 
-        return $parser->ast($parser->nodes($parser->tokens($code)));
+        return $parser->nodes($parser->tokens($code));
     }
 }
