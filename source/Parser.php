@@ -358,11 +358,7 @@ class Parser
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $printer = new Printer();
 
-        try {
-            $ast = $parser->parse($code);
-        } catch (Error $error) {
-            throw $error;
-        }
+        $ast = $parser->parse($code);
 
         return $printer->prettyPrintFile($ast);
     }
