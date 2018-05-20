@@ -1,30 +1,40 @@
 <?php
 
-function Error($props) {
-    return ( render("div", [
-"className" => "outer" . cls("special"),
-"render" => $error ⇒ render("span", [
-"className" => "error",
-"children" => $error,
-]),
-"children" => [render("span", [
-"className" => "icon",
-]) , "You forgot the", $props->name, "field"],
-]) );
+function Error($props)
+{
+    return render("div", [
+        "className" => "outer" . cls("special"),
+        "render" => function ($error) {
+            return render("span", [
+                "className" => "error",
+                "children" => $error,
+            ]);
+        },
+        "children" => [
+            render("span", [
+                "className" => "icon",
+            ]),
+            "You forgot the",
+            $props->name,
+            "field",
+        ],
+    ]);
 }
 
-function ErrorRenderer($props) {
-    return ( render("Error", [
-"children" => function($error) => {
-                return render("span", [
-"children" => $error,
-]) ;
-            },
-]) );
+function ErrorRenderer($props)
+{
+    return render("Error", [
+        "children" => function ($error) {
+            return render("span", [
+                "children" => $error,
+            ]);
+        },
+    ]);
 }
 
-function InputRenderer($props) {
+function InputRenderer($props)
+{
     return render("input", [
-"type" => $props->type,
-]) ;
+        "type" => $props->type,
+    ]);
 }

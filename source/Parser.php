@@ -3,6 +3,9 @@
 namespace Pre\Phpx;
 
 use Exception;
+use PhpParser\Error;
+use PhpParser\NodeDumper;
+use PhpParser\ParserFactory;
 
 class Parser
 {
@@ -57,7 +60,9 @@ class Parser
                 $positionLength = strlen($position);
 
                 $attribute = substr(
-                    $code, $attributeStarted + 1, $attributeEnded - $attributeStarted - 1
+                    $code,
+                    $attributeStarted + 1,
+                    $attributeEnded - $attributeStarted - 1
                 );
 
                 $attributes[$position] = $attribute;
@@ -173,7 +178,7 @@ class Parser
                 // if ($expressionStarted !== null) {
                 //     $tokens[] = ["type" => "expression", "value" => $before, "started" => $expressionStarted];
                 // } else {
-                    $tokens[] = ["type" => "literal", "value" => $before];
+                $tokens[] = ["type" => "literal", "value" => $before];
                 // }
 
                 $tokens[] = $token;
@@ -209,7 +214,7 @@ class Parser
 
         $tokens[] = ["type" => "literal", "value" => trim($code)];
 
-        return array_values(array_filter($tokens, function($token) {
+        return array_values(array_filter($tokens, function ($token) {
             if ($token["type"] === "literal" && !trim($token["value"])) {
                 return false;
             }
@@ -249,9 +254,7 @@ class Parser
                         $current["attributes"][$key] = $this->nodes($value);
                     }
                 }
-            }
-
-            else if ($token["type"] === "tag" && $token["value"][1] === "/") {
+            } elseif ($token["type"] === "tag" && $token["value"][1] === "/") {
                 preg_match("#^</([a-zA-Z]+)#", $token["value"], $matches);
 
                 if ($current === null) {
@@ -265,14 +268,10 @@ class Parser
                 if ($current !== null) {
                     $current =& $current["parent"];
                 }
-            }
-
-            else if ($current !== null) {
+            } elseif ($current !== null) {
                 $token["parent"] =& $current;
                 $current["children"][] =& $token;
-            }
-
-            else {
+            } else {
                 $nodes[] =& $token;
             }
 
@@ -295,7 +294,8 @@ class Parser
         return $nodes;
     }
 
-    public function translate($nodes, $quoteLiterals = false, $combineChildren = false) {
+    public function translate($nodes, $quoteLiterals = false, $combineChildren = false)
+    {
         $code = "";
 
         foreach ($nodes as $node) {
@@ -341,7 +341,6 @@ class Parser
                 } else {
                     $code .= "\"children\" => {$translated}," . PHP_EOL;
                 }
-                
             }
 
             $code .= "]) ";
@@ -354,14 +353,33 @@ class Parser
         return trim($code, " .,");
     }
 
+    public function format($code)
+    {
+        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $printer = new Printer();
+
+        try {
+            $ast = $parser->parse($code);
+        } catch (Error $error) {
+            throw $error;
+        }
+
+        return $printer->prettyPrintFile($ast);
+    }
+
     public static function compile($code)
     {
         static $parser;
+        static $printer;
 
         if (!$parser) {
             $parser = new static();
         }
 
-        return $parser->translate($parser->nodes($parser->tokens($code)));
+        if (!$printer) {
+            $printer = new \Pre\Plugin\Parser();
+        }
+
+        return $printer->format($parser->format($parser->translate($parser->nodes($parser->tokens($code)))));
     }
 }
