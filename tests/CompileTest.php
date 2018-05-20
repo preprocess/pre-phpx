@@ -3,6 +3,8 @@
 /**
  * @covers Pre\Phpx\Parser::compile
  * @covers Pre\Phpx\Parser::translate
+ * @covers Pre\Phpx\Parser::format
+ * @covers Pre\Phpx\Printer
  */
 class CompileTest extends TestCase
 {
