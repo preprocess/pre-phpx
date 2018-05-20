@@ -1,0 +1,11 @@
+function Label($props) {
+    return (
+        <div className={"outer"}>
+            {$props->prefix}
+            <div className={"inner"}>
+                {$props->text}
+            </div>
+            {$props->suffix}
+        </div>
+    );
+}

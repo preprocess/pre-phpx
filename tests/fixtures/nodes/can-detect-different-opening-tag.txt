@@ -1,0 +1,7 @@
+function Malformed($props) {
+    return (
+        <div>
+            </span>
+        </div>
+    );
+}

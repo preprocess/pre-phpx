@@ -2,6 +2,8 @@
 
 namespace Pre\Phpx;
 
+use Exception;
+
 class Parser
 {
     public function tokens($code)
@@ -242,11 +244,10 @@ class Parser
 
                 if (isset($current["attributes"])) {
                     foreach ($current["attributes"] as $key => $value) {
-                        $current["attributes"][$key] = nodes($value);
+                        $current["attributes"][$key] = $this->nodes($value);
                     }
 
                     $current["attributes"] = array_map(function($item) {
-
                         foreach ($item as $value) {
                             if (isset($value["tag"])) {
                                 return $value;
@@ -259,8 +260,9 @@ class Parser
                             }
                         }
 
-                        return null;
-
+                        // TODO
+                        // assumption: attributes can only be literal code or nested tags
+                        // figure out if this is true
                     }, $current["attributes"]);
                 }
             }
@@ -269,11 +271,11 @@ class Parser
                 preg_match("#^</([a-zA-Z]+)#", $token["tag"], $matches);
 
                 if ($current === null) {
-                    throw new Exception("no open tag");
+                    throw new Exception("opening tag not found");
                 }
 
                 if ($matches[1] !== $current["name"]) {
-                    throw new Exception("no matching open tag");
+                    throw new Exception("closing tag does not match opening tag");
                 }
 
                 if ($current !== null) {
@@ -291,6 +293,19 @@ class Parser
             }
 
             $cursor++;
+        }
+
+        return $this->removeParents($nodes);
+    }
+
+    private function removeParents($nodes)
+    {
+        foreach ($nodes as $i => $_) {
+            unset($nodes[$i]["parent"]);
+
+            if (isset($nodes[$i]["children"])) {
+                $nodes[$i]["children"] = $this->removeParents($nodes[$i]["children"]);
+            }
         }
 
         return $nodes;
