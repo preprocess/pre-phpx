@@ -9,6 +9,15 @@ use PhpParser\ParserFactory;
 
 class Parser
 {
+    private $printer;
+
+    public function __construct($printer = null)
+    {
+        if (is_null($printer)) {
+            $this->printer = new Printer();
+        }
+    }
+
     public function tokens($code)
     {
         $tokens = [];
@@ -356,26 +365,12 @@ class Parser
     public function format($code)
     {
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        $printer = new Printer();
-
-        $ast = $parser->parse($code);
-
-        return $printer->prettyPrintFile($ast);
+        return $this->printer->prettyPrintFile($parser->parse($code));
     }
 
-    public static function compile($code)
+    public static function compile($code, $printer = null)
     {
-        static $parser;
-        static $printer;
-
-        if (!$parser) {
-            $parser = new static();
-        }
-
-        if (!$printer) {
-            $printer = new \Pre\Plugin\Parser();
-        }
-
-        return $printer->format($parser->format($parser->translate($parser->nodes($parser->tokens($code)))));
+        $parser = new static($printer);
+        return $parser->format($parser->translate($parser->nodes($parser->tokens($code))));
     }
 }
