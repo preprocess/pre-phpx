@@ -164,16 +164,27 @@ class Parser
                     $token["attributes"] = $attributes;
                 }
 
-                if ($expressionStarted !== null) {
-                    $tokens[] = ["expression" => $before, "started" => $expressionStarted];
-                } else {
+                // TODO
+                // this was here after the last refactor
+                // leaving it until this refactor is done
+                //
+                // if ($expressionStarted !== null) {
+                //     $tokens[] = ["expression" => $before, "started" => $expressionStarted];
+                // } else {
                     $tokens[] = $before;
-                }
+                // }
 
                 $tokens[] = $token;
 
                 if (preg_match("#/>$#", $tag)) {
                     preg_match("#<([a-zA-Z]+)#", $tag, $matchesName);
+
+                    // TODO
+                    // might have to remove then when we test nodes
+                    // added to make the tokens output cleaner
+                    //
+                    $previous = $tokens[count($tokens) - 1];
+                    $tokens[count($tokens) - 1]["tag"] = trim(substr($previous["tag"], 0, strlen($previous["tag"]) - 2)) . ">";
 
                     $name = $matchesName[1];
                     $tokens[] = ["tag" => "</{$name}>"];

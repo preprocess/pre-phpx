@@ -33,4 +33,12 @@ class TokensTest extends TestCase
             $this->parser()->tokens($this->fixtureCode("can-handle-complex-props"))
         );
     }
+
+    public function test_can_handle_self_closing_tags()
+    {
+        $this->assertEquals(
+            $this->fixtureData("can-handle-self-closing-tags"),
+            $this->parser()->tokens($this->fixtureCode("can-handle-self-closing-tags"))
+        );
+    }
 }
