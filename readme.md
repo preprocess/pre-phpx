@@ -4,9 +4,9 @@ Documentation can be found at [preprocess.io](https://preprocess.io#phpx).
 
 ## Motivation
 
-I wanted to write a custom compiler, and this syntax appeals to me. It's not a replacement for client-side code, or even a very good implementation. But, I like it. That's all that counts.
+I wanted to write a custom compiler, and this syntax appeals to me. It's not a replacement for Javascript, or even a very good implementation. But, I like it. That's all that counts.
 
-If you want to write component-based code, without writing front-end code; then this might work for you. 
+If you want to write component-based code, without writing Javascript; then this might work for you. 
 
 ## Getting started
 
@@ -14,7 +14,7 @@ If you want to write component-based code, without writing front-end code; then 
 - Install the Compoer dependencies
 - Run the tests _or_ execute the example scripts
 
-This should work on PHP 7.2 (where it was developed and tested). Make an issue if it's not working on 7.2, for you.
+This should work on PHP 7.2 (where it was developed and tested). Make an issue if it's not working on 7.2 _or_ if you'd like to see things added.
 
 ## Roadmap
 
