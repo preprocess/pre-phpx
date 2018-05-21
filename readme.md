@@ -57,7 +57,7 @@ function MyForm($props) {
     );
 }
 
-...later
+// ...later
 
 print render(<Example.Application.MyForm />);
 ```
@@ -97,7 +97,7 @@ function render($name, $props = null)
     return renderHtml($name, $props);
 }
 
-...later
+// ...later
 
 print render(<MyForm />);
 ```
