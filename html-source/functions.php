@@ -3,8 +3,6 @@
 namespace Pre\Phpx\Html;
 
 use Exception;
-use function Pre\Phpx\classMatching;
-use function Pre\Phpx\functionMatching;
 
 define("ALLOWED_TAGS", [
     "a",
@@ -44,7 +42,7 @@ function render($name, $props = null)
         $name,
         $className,
         $style,
-        overridesFrom($props),
+        attributesFrom($props),
     ]));
 
     if (in_array($name, SELF_CLOSING_TAGS)) {
@@ -152,9 +150,9 @@ function childrenFrom($children = null)
     return $children;
 }
 
-function overridesFrom($props)
+function attributesFrom($props)
 {
-    $overrides = [];
+    $attributes = [];
 
     foreach ($props as $key => $value) {
         if (in_array($key, array_keys(RENAMED_PROPS))) {
@@ -165,8 +163,8 @@ function overridesFrom($props)
             $value = $value();
         }
 
-        $overrides[] = "{$key}=\"{$value}\"";
+        $attributes[] = "{$key}=\"{$value}\"";
     }
 
-    return join(" ", $overrides);
+    return join(" ", $attributes);
 }

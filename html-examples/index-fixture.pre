@@ -2,8 +2,8 @@
 
 namespace Pre\Phpx\Html\Example
 {
-    function Foo($props) {
-        return <MyForm />;
+    function MyPage($props) {
+        return <MyForm showLabel={true} />;
     }
 }
 
@@ -13,11 +13,11 @@ namespace {
     function MyForm($props) {
         return (
             <form>
-                <label htmlFor={"email"}>Email</label>
+                {$props->showLabel ? <label htmlFor={"email"}>Email</label> : null}
                 <input type={"text"} name={"email"} id={"email"} />
             </form>
         );
     }
     
-    print render("Foo");
+    print <MyPage />;
 }

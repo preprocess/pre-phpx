@@ -13,6 +13,10 @@ define("Namespaces", [
 
 function render($name, $props = null)
 {
+    if (is_array($props)) {
+        $props = (object) $props;
+    }
+    
     if ($function = functionMatching(Namespaces, $name)) {
         return call_user_func($function, $props);
     }
