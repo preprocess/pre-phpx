@@ -1,0 +1,23 @@
+<?php
+
+namespace Pre\Phpx\Html\Example
+{
+    function Foo($props) {
+        return <MyForm />;
+    }
+}
+
+namespace {
+    use function Pre\Phpx\Html\Example\render;
+
+    function MyForm($props) {
+        return (
+            <form>
+                <label htmlFor={"email"}>Email</label>
+                <input type={"text"} name={"email"} id={"email"} />
+            </form>
+        );
+    }
+    
+    print render("Foo");
+}
