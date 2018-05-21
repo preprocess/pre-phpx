@@ -16,7 +16,8 @@
             "html-examples/functions.php"
         ],
         "psr-4": {
-            "Pre\\Phpx\\": "source"
+            "Pre\\Phpx\\": "source",
+            "Pre\\Phpx\\Html\\": "html-source"
         }
     },
     "autoload-dev": {
