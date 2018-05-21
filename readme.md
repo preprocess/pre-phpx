@@ -18,9 +18,9 @@ This should work on PHP 7.2 (where it was developed and tested). Make an issue i
 
 ## What does it render?
 
-The goal was to decouple the compiler from the renderers. Once the HTML renderer moves out, you'll need to import it into your project or create a custom render function. The HTML render function looks like this:
+The goal was to decouple the compiler from the renderers. Once the Pre\Phpx\Html renderer moves out, you'll need to import it into your project or create a custom `render` function. The Pre\Phpx\Html `render` function looks like this:
 
-```
+```php
 public function render($name, $props = null)
 {
     $props = $this->propsFrom($props);
@@ -39,11 +39,9 @@ public function render($name, $props = null)
 }
 ```
 
-This means you can define your own namespaced functions and classes, and use them in the HTML render function, like:
+This means you can define your own namespaced functions and classes, and use them in the Pre\Phpx\Html `render` function, like:
 
-```
-<?php
-
+```php
 namespace Example\Application;
 
 // don't forget to define or import render
@@ -64,9 +62,9 @@ function MyForm($props) {
 print render(<Example.Application.MyForm />);
 ```
 
-If you'd prefer to have your components automatically prefixed, define your own render function, You can extend the HTML render function:
+If you'd prefer to have your components automatically prefixed, define your own `render` function, You can extend the Pre\Phpx\Html `render` function:
 
-```
+```php
 namespace Example\Application;
 
 use function Pre\Phpx\classMatching;
@@ -106,7 +104,7 @@ print render(<MyForm />);
 
 You can define components as functions or classes:
 
-```
+```php
 function MyForm($props) {
     // render things...
 }
@@ -129,7 +127,7 @@ class MyForm
 
 Since you can define a custom render function, you can decide what your components are allowed to return. HTML-in-PHP syntax is converted to the following form:
 
-```
+```php
 use function Pre\Phpx\Html\Example\render;
 
 function MyForm($props) {
@@ -165,13 +163,13 @@ function MyForm($props)
 }
 ```
 
-You decide what your components return and what your `render` function does. The HTML render function outputs strings of HTML, and expects components rendered by it to return strings (so that they can be concatenated in an array of children).
+You decide what your components return and what your `render` function does. The Pre\Phpx\Html `render` function outputs strings of HTML, and expects components rendered by it to return strings (so that they can be concatenated in an array of children).
 
-> Returning `null` will also work, because of how the concatenation is done.
+> Returning `null` will also work.
 
 ## Roadmap
 
-- [ ] Support HTML element warnings and rewriting
+- [ ] Support HTML tag warnings and rewriting
 - [ ] Move HTML renderer to its own library
 - [ ] Set up StyleCI and Travis
 - [ ] Write more tests
