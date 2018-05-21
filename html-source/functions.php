@@ -2,7 +2,7 @@
 
 namespace Pre\Phpx\Html;
 
-function render($name, $props = null)
+function renderer()
 {
     static $renderer;
 
@@ -10,5 +10,15 @@ function render($name, $props = null)
         $renderer = new Renderer();
     }
 
-    return $renderer->render($name, $props);
+    return $renderer;
+}
+
+function render($name, $props = null)
+{
+    return renderer()->render($name, $props);
+}
+
+function propsFrom($props)
+{
+    return renderer()->propsFrom($props);
 }

@@ -5,8 +5,8 @@ namespace Pre\Phpx;
 function functionMatching(array $namespaces, $name)
 {
     if (in_array("global", $namespaces)) {
-        if (function_exists("\\{$name}")) {
-            return "\\{$name}";
+        if ($matching = globalFunctionMatching($name)) {
+            return $matching;
         }
     }
 
@@ -17,17 +17,31 @@ function functionMatching(array $namespaces, $name)
     }
 }
 
+function globalFunctionMatching($name)
+{
+    if (function_exists("\\{$name}")) {
+        return "\\{$name}";
+    }
+}
+
 function classMatching(array $namespaces, $name)
 {
     if (in_array("global", $namespaces)) {
-        if (class_exists("\\{$name}", false)) {
-            return "\\{$name}";
+        if ($matching = globalClassMatching($name)) {
+            return $matching;
         }
     }
 
     foreach ($namespaces as $namespace) {
-        if (class_exists("\\{$namespace}\\{$name}", false)) {
+        if (class_exists("\\{$namespace}\\{$name}")) {
             return "\\{$namespace}\\{$name}";
         }
+    }
+}
+
+function globalClassMatching($name)
+{
+    if (class_exists("\\{$name}")) {
+        return "\\{$name}";
     }
 }

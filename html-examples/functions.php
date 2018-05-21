@@ -5,23 +5,22 @@ namespace Pre\Phpx\Html\Example;
 use function Pre\Phpx\classMatching;
 use function Pre\Phpx\functionMatching;
 use function Pre\Phpx\Html\render as renderHtml;
+use function Pre\Phpx\Html\propsFrom;
 
-define("Namespaces", [
+define("NAMESPACES", [
     "global",
     "Pre\\Phpx\\Html\\Example",
 ]);
 
 function render($name, $props = null)
 {
-    if (is_array($props)) {
-        $props = (object) $props;
-    }
+    $props = propsFrom($props);
     
-    if ($function = functionMatching(Namespaces, $name)) {
+    if ($function = functionMatching(NAMESPACES, $name)) {
         return call_user_func($function, $props);
     }
 
-    if ($class = classMatching(Namespaces, $name)) {
+    if ($class = classMatching(NAMESPACES, $name)) {
         return (new $class($props))->render();
     }
 

@@ -3,6 +3,8 @@
 namespace Pre\Phpx\Html;
 
 use Exception;
+use function Pre\Phpx\globalClassMatching;
+use function Pre\Phpx\globalFunctionMatching;
 
 class Renderer
 {
@@ -25,11 +27,19 @@ class Renderer
 
     public function render($name, $props = null)
     {
+        $props = $this->propsFrom($props);
+
+        if ($function = globalFunctionMatching($name)) {
+            return call_user_func($function, $props);
+        }
+
+        if ($class = globalClassMatching($name)) {
+            return (new $class($props))->render();
+        }
+
         if (!in_array($name, $this->allowedTags)) {
             throw new Exception("{$name} is not an allowed tag");
         }
-
-        $props = $this->propsFrom($props);
 
         $className = $this->classNameFrom($props->className);
         unset($props->className);
@@ -54,7 +64,7 @@ class Renderer
         return "<{$open}>{$children}</{$name}>";
     }
 
-    private function propsFrom($props = null)
+    public function propsFrom($props = null)
     {
         if (is_null($props)) {
             $props = (object) [];

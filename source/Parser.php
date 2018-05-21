@@ -128,7 +128,7 @@ class Parser
                 continue;
             }
 
-            preg_match("#^</?[a-zA-Z]#", substr($code, $cursor, 3), $matchesStart);
+            preg_match("#^</?[a-zA-Z.]#", substr($code, $cursor, 3), $matchesStart);
 
             if (
                 count($matchesStart)
@@ -193,7 +193,7 @@ class Parser
                 $tokens[] = $token;
 
                 if (preg_match("#/>$#", $tag)) {
-                    preg_match("#<([a-zA-Z]+)#", $tag, $matchesName);
+                    preg_match("#<([a-zA-Z.]+)#", $tag, $matchesName);
 
                     // TODO
                     // might have to remove then when we test nodes
@@ -244,7 +244,7 @@ class Parser
             $token =& $tokens[$cursor];
 
             if ($token["type"] === "tag" && $token["value"][1] !== "/") {
-                preg_match("#^<([a-zA-Z]+)#", $token["value"], $matches);
+                preg_match("#^<([a-zA-Z.]+)#", $token["value"], $matches);
 
                 if ($current !== null) {
                     $token["parent"] =& $current;
@@ -255,7 +255,7 @@ class Parser
                 }
 
                 $current =& $token;
-                $current["name"] = $matches[1];
+                $current["name"] = str_replace(".", "\\", $matches[1]);
                 $current["children"] = [];
 
                 if (isset($current["attributes"])) {
@@ -264,13 +264,15 @@ class Parser
                     }
                 }
             } elseif ($token["type"] === "tag" && $token["value"][1] === "/") {
-                preg_match("#^</([a-zA-Z]+)#", $token["value"], $matches);
+                preg_match("#^</([a-zA-Z.]+)#", $token["value"], $matches);
+
+                $name = str_replace(".", "\\", $matches[1]);
 
                 if ($current === null) {
                     throw new Exception("opening tag not found");
                 }
 
-                if ($matches[1] !== $current["name"]) {
+                if ($name !== $current["name"]) {
                     throw new Exception("closing tag does not match opening tag");
                 }
 
@@ -365,7 +367,15 @@ class Parser
     public function format($code)
     {
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        return $this->printer->prettyPrintFile($parser->parse($code));
+
+        try {
+            $parsed = $parser->parse($code);
+        } catch (Exception $e) {
+            // TODO handle this better
+            throw new Exception("could not parse code");
+        }
+
+        return $this->printer->prettyPrintFile($parsed);
     }
 
     public static function compile($code, $printer = null)
