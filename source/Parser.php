@@ -193,7 +193,7 @@ class Parser
                 $tokens[] = $token;
 
                 if (preg_match("#/>$#", $tag)) {
-                    preg_match("#<([a-zA-Z.]+)#", $tag, $matchesName);
+                    preg_match("#<([a-zA-Z.\-_]+)#", $tag, $matchesName);
 
                     // TODO
                     // might have to remove then when we test nodes
@@ -244,7 +244,7 @@ class Parser
             $token =& $tokens[$cursor];
 
             if ($token["type"] === "tag" && $token["value"][1] !== "/") {
-                preg_match("#^<([a-zA-Z.]+)#", $token["value"], $matches);
+                preg_match("#^<([a-zA-Z.\-_]+)#", $token["value"], $matches);
 
                 if ($current !== null) {
                     $token["parent"] =& $current;
@@ -264,7 +264,7 @@ class Parser
                     }
                 }
             } elseif ($token["type"] === "tag" && $token["value"][1] === "/") {
-                preg_match("#^</([a-zA-Z.]+)#", $token["value"], $matches);
+                preg_match("#^</([a-zA-Z.\-_]+)#", $token["value"], $matches);
 
                 $name = str_replace(".", "\\", $matches[1]);
 

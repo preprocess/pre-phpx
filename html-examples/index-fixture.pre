@@ -19,7 +19,7 @@ namespace
             <form>
                 {$props->showLabel ? <label htmlFor={"email"}>Email</label> : null}
                 <input type={"text"} name={"email"} id={"email"} />
-            </form>
+            </form> 
         );
     }
     
