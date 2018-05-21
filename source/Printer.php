@@ -36,8 +36,41 @@ class Printer extends Standard
         return "{$nl}namespace {$name}{$nl}{" . $this->pStmts($node->stmts) . "{$nl}}";
     }
 
+    protected function pExpr_Ternary(Expr\Ternary $node)
+    {
+        $nl = $this->nl;
+
+        if (is_null($node->if)) {
+            $results = $this->pInfixOp(
+                Expr\Ternary::class,
+                $node->cond,
+                "?: ",
+                $node->else
+            );
+        } else {
+            $results = $this->pInfixOp(
+                Expr\Ternary::class,
+                $node->cond,
+                " ?{$nl}" . $this->p($node->if) . " :{$nl}",
+                $node->else
+            );
+        }
+
+        return $this->indentMore($results);
+    }
+
+    protected function indentMore($code, $indent = "    ")
+    {
+        $nl = $this->nl;
+        return preg_replace("#({$nl})(\s*)#", "$1{$indent}$2", $code);
+    }
+
     protected function pExpr_Array(Expr\Array_ $node)
     {
+        if (count($node->items) < 1) {
+            return "[]";
+        }
+
         return "[" . $this->pMaybeMultiline($node->items, true) . "]";
     }
 
