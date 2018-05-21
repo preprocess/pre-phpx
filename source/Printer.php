@@ -8,9 +8,32 @@ use PhpParser\PrettyPrinter\Standard;
 
 class Printer extends Standard
 {
+    protected function pStmts(array $nodes, bool $indent = true) : string
+    {
+        $nl = $this->nl;
+        return preg_replace("#\{\s*{$nl}\s*{$nl}#", "{{$nl}", parent::pStmts($nodes, $indent));
+    }
+
     protected function pStmt_Function(Stmt\Function_ $node)
     {
         return $this->nl . parent::pStmt_Function($node);
+    }
+
+    protected function pExpr_Print(Expr\Print_ $node)
+    {
+        return $this->nl . $this->pPrefixOp(Expr\Print_::class, 'print ', $node->expr);
+    }
+
+    protected function pStmt_Namespace(Stmt\Namespace_ $node)
+    {
+        $nl = $this->nl;
+        $name = is_null($node->name) ? " " : $this->p($node->name);
+
+        if ($this->canUseSemicolonNamespaces) {
+            return "{$nl}namespace {$name};{$nl}" . $this->pStmts($node->stmts, false);
+        }
+
+        return "{$nl}namespace {$name}{$nl}{" . $this->pStmts($node->stmts) . "{$nl}}";
     }
 
     protected function pExpr_Array(Expr\Array_ $node)
