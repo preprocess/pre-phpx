@@ -22,7 +22,7 @@ namespace
             </form> 
         );
     }
-    
+
     print <MyPage />;
     /* print <Pre.Phpx.Html.Example.MyPage />; */
 }
