@@ -11,7 +11,7 @@ If you want to write component-based code, without writing Javascript; then this
 ## Getting started
 
 - Clone the repository
-- Install the Compoer dependencies
+- Install the Composer dependencies
 - Run the tests _or_ execute the example scripts
 
 This should work on PHP 7.2 (where it was developed and tested). Make an issue if it's not working on 7.2 _or_ if you'd like to see things added.
