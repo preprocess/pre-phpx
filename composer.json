@@ -12,13 +12,10 @@
     },
     "autoload": {
         "files": [
-            "source/functions.php",
-            "html-source/functions.php",
-            "html-examples/functions.php"
+            "source/functions.php"
         ],
         "psr-4": {
-            "Pre\\Phpx\\": "source",
-            "Pre\\Phpx\\Html\\": "html-source"
+            "Pre\\Phpx\\": "source"
         }
     },
     "autoload-dev": {
