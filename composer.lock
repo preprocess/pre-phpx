@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b16cda9c1ca9d4a9860540d38087a644",
+    "content-hash": "2dbbc3fb133fccce70a7d36ebaf05e3d",
     "packages": [
         {
             "name": "gajus/dindent",
@@ -108,12 +108,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/preprocess/pre-plugin.git",
-                "reference": "3c3e49e068c62cd5cc41f142f874e9d85dc51334"
+                "reference": "86dbda565749ee5cd482502b7e4804ef7adca05e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/preprocess/pre-plugin/zipball/3c3e49e068c62cd5cc41f142f874e9d85dc51334",
-                "reference": "3c3e49e068c62cd5cc41f142f874e9d85dc51334",
+                "url": "https://api.github.com/repos/preprocess/pre-plugin/zipball/86dbda565749ee5cd482502b7e4804ef7adca05e",
+                "reference": "86dbda565749ee5cd482502b7e4804ef7adca05e",
                 "shasum": ""
             },
             "require": {
@@ -126,7 +126,7 @@
             "type": "composer-plugin",
             "extra": {
                 "class": [
-                    "Pre\\Plugin\\Composer\\Plugin"
+                    "\\Pre\\Plugin\\Composer\\Plugin"
                 ]
             },
             "autoload": {
@@ -145,7 +145,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2018-02-20T06:47:27+00:00"
+            "time": "2018-05-24T07:13:13+00:00"
         }
     ],
     "packages-dev": [

@@ -22,7 +22,7 @@
         "files": ["tests/TestCase.php"]
     },
     "extra": {
-        "compilers": ["Pre\\Phpx\\compile"]
+        "compilers": ["\\Pre\\Phpx\\compile"]
     },
     "minimum-stability": "dev",
     "prefer-stable": true

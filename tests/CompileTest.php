@@ -2,7 +2,6 @@
 
 /**
  * @covers Pre\Phpx\Parser::__construct
- * @covers Pre\Phpx\Parser::compile
  * @covers Pre\Phpx\Parser::translate
  * @covers Pre\Phpx\Parser::format
  * @covers Pre\Phpx\Printer
@@ -13,7 +12,7 @@ class CompileTest extends TestCase
     {
         $this->assertEquals(
             $this->fixtureCode("compile/can-compile", "php"),
-            \Pre\Phpx\Parser::compile($this->fixtureCode("compile/can-compile", "pre"))
+            \Pre\Phpx\compile($this->fixtureCode("compile/can-compile", "pre"))
         );
     }
 }

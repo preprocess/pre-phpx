@@ -363,10 +363,4 @@ class Parser
 
         return $this->printer->prettyPrintFile($parsed);
     }
-
-    public static function compile($code, $printer = null)
-    {
-        $parser = new static($printer);
-        return $parser->format($parser->translate($parser->nodes($parser->tokens($code))));
-    }
 }

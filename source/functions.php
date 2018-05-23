@@ -2,6 +2,14 @@
 
 namespace Pre\Phpx;
 
+function compile($code, $printer = null)
+{
+    // ...we should memoize this
+    $parser = new Parser($printer);
+
+    return $parser->format($parser->translate($parser->nodes($parser->tokens($code))));
+}
+
 function functionMatching(array $namespaces, $name)
 {
     if (in_array("global", $namespaces)) {
