@@ -707,10 +707,6 @@ class Renderer
         $attributes = [];
 
         foreach ($props as $key => $value) {
-            // if (in_array($key, array_keys($this->renamedAttributes))) {
-            //     $key = $this->renamedAttributes[$key];
-            // }
-
             $properKey = $key;
 
             $reversedAttributes = array_reverse($this->renamedAttributes);

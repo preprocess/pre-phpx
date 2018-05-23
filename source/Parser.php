@@ -81,7 +81,7 @@ class Parser
 
                 $code = $before . $position . $after;
 
-                $cursor = $attributeStarted + $positionLength + 2 /* curlies */;
+                $cursor = $attributeStarted + $positionLength + 2 /* braces */;
                 $length = strlen($code);
 
                 $attributeStarted = null;
@@ -180,25 +180,12 @@ class Parser
                     $token["attributes"] = $attributes;
                 }
 
-                // TODO
-                // this was here after the last refactor
-                // leaving it until this refactor is done
-                //
-                // if ($expressionStarted !== null) {
-                //     $tokens[] = ["type" => "expression", "value" => $before, "started" => $expressionStarted];
-                // } else {
                 $tokens[] = ["type" => "literal", "value" => $before];
-                // }
-
                 $tokens[] = $token;
 
                 if (preg_match("#/>$#", $tag)) {
                     preg_match("#<([a-zA-Z.\-_]+)#", $tag, $matchesName);
 
-                    // TODO
-                    // might have to remove then when we test nodes
-                    // added to make the tokens output cleaner
-                    //
                     $previous = $tokens[count($tokens) - 1];
                     $tokens[count($tokens) - 1]["value"] = trim(substr($previous["value"], 0, strlen($previous["value"]) - 2)) . ">";
 
@@ -371,7 +358,6 @@ class Parser
         try {
             $parsed = $parser->parse($code);
         } catch (Exception $e) {
-            // TODO handle this better
             throw new Exception("could not parse code");
         }
 
