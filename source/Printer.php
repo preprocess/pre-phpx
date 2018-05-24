@@ -27,13 +27,13 @@ class Printer extends Standard
     protected function pStmt_Namespace(Stmt\Namespace_ $node)
     {
         $nl = $this->nl;
-        $name = is_null($node->name) ? " " : $this->p($node->name);
+        $name = is_null($node->name) ? "" : " " . $this->p($node->name);
 
         if ($this->canUseSemicolonNamespaces) {
-            return "{$nl}namespace {$name};{$nl}" . $this->pStmts($node->stmts, false);
+            return "{$nl}namespace{$name};{$nl}" . $this->pStmts($node->stmts, false);
         }
 
-        return "{$nl}namespace {$name}{$nl}{" . $this->pStmts($node->stmts) . "{$nl}}";
+        return "{$nl}namespace{$name}{$nl}{" . $this->pStmts($node->stmts) . "{$nl}}";
     }
 
     protected function pExpr_Ternary(Expr\Ternary $node)
