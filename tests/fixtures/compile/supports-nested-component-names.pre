@@ -1,0 +1,19 @@
+<?php
+
+namespace Example
+{
+    function MyComponent()
+    {
+        return <div>hello world</div>;
+    }
+}
+
+namespace
+{
+    function render($name, $props = null)
+    {
+        print $name;
+    }
+
+    print <Example.MyComponent />;
+}

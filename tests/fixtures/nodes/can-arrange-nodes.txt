@@ -1,0 +1,7 @@
+function Error($props) {
+    return (
+        <div render={$error ⇒ <span className={"error"}>{$error}</span>}>
+            You forgot the {$props->name} field
+        </div>
+    );
+}
