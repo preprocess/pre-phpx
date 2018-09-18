@@ -358,7 +358,8 @@ class Parser
         try {
             $parsed = $parser->parse($code);
         } catch (Exception $e) {
-            throw new Exception("could not parse code");
+            // can't format, but we can still return...
+            return $code;
         }
 
         return $this->printer->prettyPrintFile($parsed);
