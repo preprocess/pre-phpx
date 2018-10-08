@@ -11,7 +11,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function fixtureCode($path, $extension = "txt")
     {
-        return trim(file_get_contents(__DIR__ . "/fixtures/{$path}.{$extension}"));
+        return file_get_contents(__DIR__ . "/fixtures/{$path}.{$extension}");
     }
 
     protected function fixtureData($path, $extension = "php")

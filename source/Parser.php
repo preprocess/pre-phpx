@@ -3,20 +3,10 @@
 namespace Pre\Phpx;
 
 use Exception;
-use PhpParser\Error;
-use PhpParser\NodeDumper;
-use PhpParser\ParserFactory;
 
 class Parser
 {
     private $printer;
-
-    public function __construct($printer = null)
-    {
-        if (is_null($printer)) {
-            $this->printer = new Printer();
-        }
-    }
 
     public function tokens($code)
     {
@@ -353,15 +343,7 @@ class Parser
 
     public function format($code)
     {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-
-        try {
-            $parsed = $parser->parse($code);
-        } catch (Exception $e) {
-            // can't format, but we can still return...
-            return $code;
-        }
-
-        return $this->printer->prettyPrintFile($parsed);
+        // left to avoid a version bump
+        return $code;
     }
 }

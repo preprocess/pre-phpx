@@ -1,21 +1,19 @@
 <?php
 
-namespace Example
-{
+namespace Example {
     function MyComponent()
     {
         return render("div", [
-            "children" => "hello world",
+            "children" => "hello world"
         ]);
     }
 }
 
-namespace
-{
+namespace {
     function render($name, $props = null)
     {
         print $name;
     }
-    
-    print render("Example\\MyComponent", []);
+
+    print render("Example\MyComponent", []);
 }

@@ -1,3 +1,3 @@
 function Hello($props) {
-    return <div className={$error ⇒ <span>{$error}</span>}>You forgot a field</div>;
+    return <div className={$error ~> <span>{$error}</span>}>You forgot a field</div>;
 }
