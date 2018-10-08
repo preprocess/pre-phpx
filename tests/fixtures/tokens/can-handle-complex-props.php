@@ -16,12 +16,12 @@ function Hello(\$props) {
             [
                 [
                     "type" => "literal",
-                    "value" => "\$error ⇒",
+                    "value" => "\$error ~>",
                 ],
                 [
                     "type" => "tag",
                     "value" => "<span>",
-                    "started" => 16,
+                    "started" => 15,
                 ],
                 [
                     "type" => "expression",
@@ -31,12 +31,12 @@ function Hello(\$props) {
                             "value" => "\$error",
                         ],
                     ],
-                    "started" => 23,
+                    "started" => 22,
                 ],
                 [
                     "type" => "tag",
                     "value" => "</span>",
-                    "started" => 29,
+                    "started" => 28,
                 ],
             ]
         ],

@@ -13,7 +13,7 @@ class CompileTest extends TestCase
     {
         $this->assertEquals(
             $this->fixtureCode("compile/can-compile", "php"),
-            \Pre\Phpx\compile($this->fixtureCode("compile/can-compile", "pre"))
+            \Pre\Plugin\format(\Pre\Phpx\compile($this->fixtureCode("compile/can-compile", "pre")))
         );
     }
 
@@ -21,7 +21,7 @@ class CompileTest extends TestCase
     {
         $this->assertEquals(
             $this->fixtureCode("compile/supports-nested-component-names", "php"),
-            \Pre\Phpx\compile($this->fixtureCode("compile/supports-nested-component-names", "pre"))
+            \Pre\Plugin\format(\Pre\Phpx\compile($this->fixtureCode("compile/supports-nested-component-names", "pre")))
         );
     }
 }

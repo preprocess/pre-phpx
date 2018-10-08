@@ -16,7 +16,7 @@ function Error(\$props) {
             [
                 [
                     "type" => "literal",
-                    "value" => "\$error ⇒",
+                    "value" => "\$error ~>",
                 ],
                 [
                     "type" => "tag",
@@ -38,11 +38,11 @@ function Error(\$props) {
                                     "value" => "\$error",
                                 ],
                             ],
-                            "started" => 37,
+                            "started" => 36,
                         ],
                     ],
                     "name" => "span",
-                    "started" => 30,
+                    "started" => 29,
                 ],
             ],
         ],
