@@ -118,7 +118,7 @@ class Parser
                 continue;
             }
 
-            preg_match("#^</?[a-zA-Z.]#", substr($code, $cursor, 3), $matchesStart);
+            preg_match("#^</?[0-9a-zA-Z.]#", substr($code, $cursor, 3), $matchesStart);
 
             if (
                 count($matchesStart)
@@ -174,7 +174,7 @@ class Parser
                 $tokens[] = $token;
 
                 if (preg_match("#/>$#", $tag)) {
-                    preg_match("#<([a-zA-Z.\-_]+)#", $tag, $matchesName);
+                    preg_match("#<([0-9a-zA-Z.\-_]+)#", $tag, $matchesName);
 
                     $previous = $tokens[count($tokens) - 1];
                     $tokens[count($tokens) - 1]["value"] = trim(substr($previous["value"], 0, strlen($previous["value"]) - 2)) . ">";
@@ -221,7 +221,7 @@ class Parser
             $token =& $tokens[$cursor];
 
             if ($token["type"] === "tag" && $token["value"][1] !== "/") {
-                preg_match("#^<([a-zA-Z.\-_]+)#", $token["value"], $matches);
+                preg_match("#^<([0-9a-zA-Z.\-_]+)#", $token["value"], $matches);
 
                 if ($current !== null) {
                     $token["parent"] =& $current;
@@ -241,7 +241,7 @@ class Parser
                     }
                 }
             } elseif ($token["type"] === "tag" && $token["value"][1] === "/") {
-                preg_match("#^</([a-zA-Z.\-_]+)#", $token["value"], $matches);
+                preg_match("#^</([0-9a-zA-Z.\-_]+)#", $token["value"], $matches);
 
                 $name = str_replace(".", "\\", $matches[1]);
 

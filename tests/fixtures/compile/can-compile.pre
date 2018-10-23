@@ -9,6 +9,7 @@ function Error($props) {
             }}
         >
             <span className={"icon"}></span>
+            <h4>Error</h4>
             You forgot the {$props->name} field
         </div>
     );

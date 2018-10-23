@@ -14,6 +14,9 @@ function Error($props)
             render("span", [
                 "className" => "icon"
             ]),
+            render("h4", [
+                "children" => "Error"
+            ]),
             "You forgot the",
             $props->name,
             "field"
