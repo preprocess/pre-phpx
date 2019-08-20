@@ -7,20 +7,20 @@ function Error($props)
         "render" => function ($error) {
             return render("span", [
                 "className" => "error",
-                "children" => $error
+                "children" => $error,
             ]);
         },
         "children" => [
             render("span", [
-                "className" => "icon"
+                "className" => "icon",
             ]),
             render("h4", [
-                "children" => "Error"
+                "children" => "Error",
             ]),
             "You forgot the",
             $props->name,
-            "field"
-        ]
+            "field",
+        ],
     ]);
 }
 
@@ -29,15 +29,15 @@ function ErrorRenderer($props)
     return render("Error", [
         "children" => function ($error) {
             return render("span", [
-                "children" => $error
+                "children" => $error,
             ]);
-        }
+        },
     ]);
 }
 
 function InputRenderer($props)
 {
     return render("input", [
-        "type" => $props->type
+        "type" => $props->type,
     ]);
 }

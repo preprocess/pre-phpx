@@ -4,7 +4,7 @@ namespace Example {
     function MyComponent()
     {
         return render("div", [
-            "children" => "hello world"
+            "children" => "hello world",
         ]);
     }
 }
